@@ -1,0 +1,183 @@
+```{R}
+library(ggplot2)
+library(Seurat)
+library(SeuratDisk)
+library(loomR)
+library(SeuratData)
+library(dplyr)
+```
+
+/concat_all报错解决gene个数大于1: Error in dimnames(x) <- dn : 'dimnames'的长度[1]必需与陈列范围相等
+```{R: 不用}
+Convert("/home/huggs/shiyi/SCST/RCTD/RCTD/predata/celltrek_kidney/mymodel/7_sc_row_col/try_multimode/allst_map/concat_all.h5ad", dest = "h5seurat", overwrite = TRUE)
+desc_result_1 <- LoadH5Seurat("/home/huggs/shiyi/SCST/RCTD/RCTD/predata/celltrek_kidney/mymodel/7_sc_row_col/try_multimode/allst_map/concat_all.h5seurat")
+desc_result_1 #2 features across 895664 samples 
+head(desc_result_1)
+head(colnames(desc_result_1))
+head(rownames(desc_result_1))
+head(desc_result_1$RNA@counts)
+head(desc_result_1$RNA@data,1)
+saveRDS(desc_result_1,"/home/huggs/shiyi/SCST/RCTD/RCTD/predata/celltrek_kidney/mymodel/7_sc_row_col/try_multimode/allst_map/concat_all.rds")
+
+```
+
+```{R:修改}
+Convert("/home/huggs/shiyi/SCST/RCTD/RCTD/predata/celltrek_kidney/mymodel/7_sc_row_col/try_multimode/allst_map/concat_all_1.h5ad", dest = "h5seurat", overwrite = TRUE)
+desc_result_1 <- LoadH5Seurat("/home/huggs/shiyi/SCST/RCTD/RCTD/predata/celltrek_kidney/mymodel/7_sc_row_col/try_multimode/allst_map/concat_all_1.h5seurat")
+desc_result_1 #2 features across 895664 samples 
+head(desc_result_1)
+head(colnames(desc_result_1))
+head(rownames(desc_result_1))
+head(desc_result_1$RNA@counts)
+head(desc_result_1$RNA@data,1)
+saveRDS(desc_result_1,"/home/huggs/shiyi/SCST/RCTD/RCTD/predata/celltrek_kidney/mymodel/7_sc_row_col/try_multimode/allst_map/concat_all_1.rds")
+
+```
+```{R}
+desc_result_1@reductions
+desc_result_1$spatial_1 <- desc_result_1$spatial_row  
+desc_result_1$spatial_2 <- desc_result_1$spatial_col
+
+sapply(head(desc_result_1[[c('spatial_1','spatial_2')]]), class)  # "factor"  "factor"
+#转化为数字格式
+desc_result_1[[c('spatial_1','spatial_2')]]$spatial_1<- as.numeric(as.character(desc_result_1[[c('spatial_1','spatial_2')]]$spatial_1))
+desc_result_1[[c('spatial_1','spatial_2')]]$spatial_2<- as.numeric(as.character(desc_result_1[[c('spatial_1','spatial_2')]]$spatial_2))
+loca <- as.matrix( desc_result_1[[c('spatial_1','spatial_2')]])
+head(desc_result_1[[c('spatial_1','spatial_2')]])
+desc_result_1[["spatial"]] <- CreateDimReducObject(embeddings=loca)
+head(Embeddings(desc_result_1, reduction ='spatial'))
+head(Loadings(desc_result_1, reduction ='spatial'))
+
+pdf(file="/home/huggs/shiyi/SCST/RCTD/RCTD/predata/celltrek_kidney/mymodel/7_sc_row_col/try_multimode/allst_map/CONCAT/sc_test_spatial_1.pdf",width=7)
+DimPlot(desc_result_1, reduction='spatial',group.by="desc_0.8",pt.size=1.5)
+while (!is.null(dev.list()))  dev.off()
+#DimPlot(tcell,reduction="st",label=T)+NoLegend()
+```
+
+```{R}
+st_data=Seurat::Load10X_Spatial("/home/huggs/shiyi/SCST/RCTD/RCTD/predata/celltrek_kidney/celltrek_kidney/V1_Mouse_Kidney")
+pdf(file="/home/huggs/shiyi/SCST/RCTD/RCTD/predata/celltrek_kidney/mymodel/7_sc_row_col/try_multimode/allst_map/CONCAT/SpatialDimPlot.pdf")
+SpatialDimPlot(st_data)
+while (!is.null(dev.list()))  dev.off()
+head(st_data@images[[1]]@coordinates)
+head(st_data@images[[1]]@assay)
+table(st_data@images[[1]]@coordinates$row)
+##
+desc_result_1@images <- st_data@images
+
+desc_result_1@images[[1]]@assay <- DefaultAssay(desc_result_1)
+
+#col_row=readRDS("/home/huggs/shiyi/SCST/RCTD/RCTD/predata/celltrek_kidney/mymodel/7_sc_row_col/sc_row_col_origin.rds")
+#head(col_row)
+desc_result_1$array_1 <- desc_result_1$array_row
+desc_result_1$array_2 <- desc_result_1$array_col
+desc_result_1[[c('array_1','array_2')]]$array_1<- as.numeric(as.character(desc_result_1[[c('array_1','array_2')]]$array_1))
+desc_result_1[[c('array_1','array_2')]]$array_2<- as.numeric(as.character(desc_result_1[[c('array_1','array_2')]]$array_2))
+loca <- as.matrix( desc_result_1[[c('array_1','array_2')]])
+head(desc_result_1[[c('array_1','array_2')]])
+desc_result_1[["array"]] <- CreateDimReducObject(embeddings=loca)
+head(Embeddings(desc_result_1, reduction ='array'))
+
+dd=data.frame(row=desc_result_1@meta.data$array_2,col=desc_result_1@meta.data$array_1,imagerow=desc_result_1@meta.data$spatial_2,
+                                                  imagecol=desc_result_1@meta.data$spatial_1) 
+rownames(dd)= rownames(desc_result_1@meta.data)
+desc_result_1@images[[1]]@coordinates <- dd
+head(desc_result_1@images[[1]]@coordinates)
+# row col imagerow imagecol
+#Z1_F_F1_AAACCTGAGAGACGAA  35  49     6946     3636
+#desc_result_1@images[[1]]@scale.factors$spot_dis <- spot_dis
+#any(is.na(desc_result_1$desc_0.8))
+#head(desc_result_1@images$slice1@image) 
+#head(desc_result_1@images$slice1@scale.factors$lowres)
+table(desc_result_1@meta.data$spatial_1)
+table(desc_result_1@meta.data$array_1)
+type=c("vascular","immune","vascular","nephron","nephron","ureteric","nephron","vascular","immune","ureteric","nephron","nephron","nephron","immune","ureteric","interstitial","nephron","nephron","immune","unknown","immune","ureteric","nephron","immune","vascular","nephron","immune","interstitial")
+desc_result_1@meta.data$celltype<-plyr::mapvalues(x = desc_result_1@meta.data$desc_0.8, from = c(0:27), to = type)#
+subcelltype1=c("Vascular_1","Macrophage","Vascular_2","PT_1","DT_1","Principal_1","PT_2","Vascular_3","B_lymphocytes","Principal_2","DT_2","tl-LoH_1","tl-LoH_2","T_lymphocytes","Intercalated","VSMC","PT_3","PT_4","T_lymph_2","unknown","NK_myeloid","Principal_3","PT_5","NK_myeloid_2","Vascular_4","RC","NK_myeloid_3","Fibroblast")
+desc_result_1@meta.data$subcelltype1<-plyr::mapvalues(x = desc_result_1@meta.data$desc_0.8, from = c(0:27), to = subcelltype1)#
+saveRDS(desc_result_1,"/home/huggs/shiyi/SCST/RCTD/RCTD/predata/celltrek_kidney/mymodel/7_sc_row_col/try_multimode/allst_map/CONCAT/sc_spatial_st.rds")
+
+pdf(file="/home/huggs/shiyi/SCST/RCTD/RCTD/predata/celltrek_kidney/mymodel/7_sc_row_col/try_multimode/allst_map/CONCAT/sc_test_spatial_st_1.pdf")
+SpatialDimPlot(desc_result_1, group.by='desc_0.8',images='slice1',pt.size=1.5,crop=FALSE)
+SpatialDimPlot(desc_result_1, group.by='celltype',pt.size=1.5,crop=FALSE,label=FALSE)
+SpatialDimPlot(desc_result_1, group.by='subcelltype1',images='slice1',pt.size=1.5,crop=FALSE,label=FALSE)
+while (!is.null(dev.list()))  dev.off()
+
+pdf(file="/home/huggs/shiyi/SCST/RCTD/RCTD/predata/celltrek_kidney/mymodel/7_sc_row_col/try_multimode/allst_map/CONCAT/sc_test_spatial_st_concat_1.pdf")
+SpatialDimPlot(desc_result_1, group.by='desc_0.8',images='slice1',pt.size=1.2,crop=FALSE)
+while (!is.null(dev.list()))  dev.off()
+pdf(file="/home/huggs/shiyi/SCST/RCTD/RCTD/predata/celltrek_kidney/mymodel/7_sc_row_col/try_multimode/allst_map/CONCAT/sc_test_spatial_st_concat_subcelltype1.pdf")
+SpatialDimPlot(desc_result_1, group.by='subcelltype1',images='slice1',pt.size=1.5,crop=FALSE)
+while (!is.null(dev.list()))  dev.off()
+
+```
+```{R}
+desc_result_1=readRDS("/home/huggs/shiyi/SCST/RCTD/RCTD/predata/celltrek_kidney/mymodel/7_sc_row_col/try_multimode/allst_map/CONCAT/sc_spatial_st.rds")
+png(file="/home/huggs/shiyi/SCST/RCTD/RCTD/PLOT/FIG2_KIDNEY/2E_MY_sc_spatial_concat.png",units="in", width=8, height=5,res=300))
+SpatialDimPlot(desc_result_1, group.by='subcelltype1',images='slice1',pt.size=1.5,crop=FALSE)+
+  ggtitle("scRNA-seq with spatial coordinates")
+while (!is.null(dev.list()))  dev.off()
+
+```
+#
+desc_result_1=readRDS("/home/huggs/shiyi/SCST/RCTD/RCTD/predata/celltrek_kidney/mymodel/7_sc_row_col/try_multimode/allst_map/testconcat3.rds")
+
+#allst_map报错:
+Error in dfile$obj_copy_from(src_loc = source, src_name = "obs", dst_name = "meta.data") : 
+  HDF5-API Errors:
+    error #000: H5Ocopy.c in H5Ocopy(): line 240: unable to copy object
+        class: HDF5
+        major: Object header
+        minor: Unable to copy object
+
+    error #001: H5VLcallback.c in H5VL_object_copy(): line 5495: object copy failed
+        class: HDF5
+        major: Virtual Object Layer
+        minor: Unable to copy object
+
+    error #002: H5VLcallback.c in H5VL__object_copy(): line 5456: object copy failed
+        class: HDF5
+        major: Virtual Object Layer
+        minor: Unable to copy object
+
+    error #003: H5VLnative_object.c in H5VL__native_object_copy(): line 125: unable to copy object
+        class: HDF5
+        major: Object header
+        minor: Unable to copy object
+
+    error #004: H5Ocopy.c in H5O__copy(): line 301: unable to copy object
+        class: HDF5
+        major: Object header
+        minor: Unable to copy object
+
+    error #005: H5Ocopy.c in H5O__copy_obj(): line 1196: unable to copy object
+        class: HDF5
+        majo
+Error in private$closeFun(id) : HDF5-API Errors:
+    error #000: H5F.c in H5Fclose(): line 711: decrementing file ID failed
+        class: HDF5
+        major: File accessibility
+        minor: Unable to close file
+
+    error #001: H5Iint.c in H5I_dec_app_ref(): line 1018: can't decrement ID ref count
+        class: HDF5
+        major: Object atom
+        minor: Unable to decrement reference count
+
+    error #002: H5Fint.c in H5F__close_cb(): line 251: unable to close file
+        class: HDF5
+        major: File accessibility
+        minor: Unable to close file
+
+    error #003: H5VLcallback.c in H5VL_file_close(): line 3983: file close failed
+        class: HDF5
+        major: Virtual Object Layer
+        minor: Unable to close file
+
+    error #004: H5VLcallback.c in H5VL__file_close(): line 3952: file close failed
+        class: HDF5
+        major: Virtual Object Layer
+        minor: Unable to close file
+
+    error #005: H5VLnative_file.c in H5VL__native_file_close(): line 838: can't close file
+        class
