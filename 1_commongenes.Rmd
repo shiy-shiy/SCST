@@ -1,0 +1,231 @@
+
+```{r}
+library(Seurat)
+library(dplyr)
+library(SeuratDisk)
+library(SeuratData)
+library(Matrix)
+
+
+```
+
+# st data: 32285 features across 1438 samples
+```{r: st data}
+list.files("/home/huggs/shiyi/SCST/RCTD/RCTD/predata/celltrek_kidney/celltrek_kidney/V1_Mouse_Kidney")
+st<-Seurat::Load10X_Spatial("/home/huggs/shiyi/SCST/RCTD/RCTD/predata/celltrek_kidney/celltrek_kidney/V1_Mouse_Kidney")
+head(st@assays$Spatial@counts)   #32285 features across 1438 samples
+```
+
+# sc:27998 features across 40712 samples
+```{r: sc data}
+count_matrix1 <- Read10X(data.dir = "/home/huggs/shiyi/SCST/RCTD/RCTD/predata/celltrek_kidney/celltrek_kidney/Mouse_Adult_DGE", gene.column = 1)
+sc = CreateSeuratObject(counts = count_matrix1,
+                                   min.cells = 0, 
+                                   min.features = 0, 
+                                   project = "seurat_object")                                   
+saveRDS(sc,"/home/huggs/shiyi/SCST/RCTD/RCTD/predata/celltrek_kidney/celltrek_kidney/Mouse_Adult_DGE.rds")
+sc=readRDS("/home/huggs/shiyi/SCST/RCTD/RCTD/predata/celltrek_kidney/celltrek_kidney/Mouse_Adult_DGE.rds")
+counts = sc@assays$RNA@counts
+dim(counts) #27998 40712
+head(colnames(counts))
+head(rownames(counts))
+head(counts)
+
+SaveH5Seurat(sc, filename = "/home/huggs/shiyi/SCST/RCTD/RCTD/predata/celltrek_kidney/celltrek_kidney/Mouse_Adult_DGE.h5Seurat")
+Convert("/home/huggs/shiyi/SCST/RCTD/RCTD/predata/celltrek_kidney/celltrek_kidney/Mouse_Adult_DGE.h5Seurat", dest = "h5ad")
+
+```
+
+# merge genes 交集
+```{r: merge genes }
+#pbmc.big <- merge(sc, y = c(st), add.cell.ids = c("sc","st"), project = "merge")    #43899 features across 43519
+total.genes <- c(rownames(sc@assays$RNA@counts),
+                    rownames(st@assays$Spatial@counts))
+# Get common gene names 
+common.genes1 <- unique(total.genes[duplicated(total.genes)])   #25954 #unique(取向量total.genes中的重复值)    #12845
+#or:
+total.genes <-list(rownames(sc@assays$RNA@counts),
+                    rownames(st@assays$Spatial@counts))
+common.genes <- Reduce(f = intersect, x = total.genes)  #25954
+
+sc_common=subset(sc,features=common.genes1) #25954 features across 40712 samples
+st_common=subset(st,features=common.genes1) #25954 features across 1438 samples
+saveRDS(sc_common,"/home/huggs/shiyi/SCST/RCTD/RCTD/predata/celltrek_kidney/mymodel/1_predata/sc_common.rds")
+saveRDS(st_common,"/home/huggs/shiyi/SCST/RCTD/RCTD/predata/celltrek_kidney/mymodel/1_predata/st_common.rds")
+
+```
+
+# hvg_sc
+```{r hvg_sc_common}
+sc_common=readRDS("sc_common.rds")
+sc_common_norm= NormalizeData(sc_common, normalization.method = "LogNormalize")
+desc_hvg <- FindVariableFeatures(sc_common_norm, selection.method = "vst", nfeatures = 2000)
+desc_hvg
+#saveRDS(desc_hvg,"/home/huggs/shiyi/SCST/RCTD/RCTD/predata/celltrek_kidney/mymodel/1_predata/sc_common_norm_hvg.rds")
+desc_vst <- ScaleData(desc_hvg)
+#saveRDS(desc_vst,"/s/f/shiyi/ST/hierarchy_dense_net/test1029/mynetwork/mynetwork_scstmerge_deconvolution/MY_RCTD/MYDATA/under_sample/sc_common_norm_hvg_scale.rds")
+var.gene <- desc_vst@assays$RNA@var.features
+sc_2000=subset(desc_vst,features=var.gene,slot="counts" ) #2000 features across 40712 samples
+head(sc_2000$RNA@counts,1)  #未norm过
+head(sc_2000$RNA@data,1)    #是norm过的
+saveRDS(sc_2000,"/home/huggs/shiyi/SCST/RCTD/RCTD/predata/celltrek_kidney/mymodel/1_predata/sc_common_norm_hvg_2000.rds")
+
+```
+## hvg_st_common&RCTD SPOTS:按照spots抽取,再做hvg2000
+```{r hvg_st_common}
+st_common_norm= NormalizeData(st_common, normalization.method = "LogNormalize")
+desc_hvg <- FindVariableFeatures(st_common_norm, selection.method = "vst", nfeatures = 2000)
+desc_hvg
+#saveRDS(desc_hvg,"/s/f/shiyi/ST/hierarchy_dense_net/test1029/mynetwork/mynetwork_scstmerge_deconvolution/MY_RCTD/MYDATA/under_sample/st_subsetRCTD/st_common_norm_hvg.rds")
+#desc_hvg=readRDS("/s/f/shiyi/ST/hierarchy_dense_net/test1029/mynetwork/mynetwork_scstmerge_deconvolution/MY_RCTD/MYDATA/under_sample/st_subsetRCTD/st_common_norm_hvg.rds")
+desc_vst <- ScaleData(desc_hvg)
+#saveRDS(desc_vst,"/s/f/shiyi/ST/hierarchy_dense_net/test1029/mynetwork/mynetwork_scstmerge_deconvolution/MY_RCTD/MYDATA/under_sample/st_subsetRCTD/st_common_norm_hvg_scale.rds")
+var.gene_st <- desc_vst@assays$Spatial@var.features
+st_2000=subset(desc_vst,features=var.gene_st,slot="counts" ) #2000 features across 40532 samples
+head(st_2000$Spatial@counts,1)  #未norm过
+head(st_2000$Spatial@data,1)    #是norm过的
+saveRDS(st_2000,"/home/huggs/shiyi/SCST/RCTD/RCTD/predata/celltrek_kidney/mymodel/1_predata/st_common_norm_hvg_2000.rds")
+```
+
+# merge sc_2000 & st_2000 genes and combine
+```{r: 并集 2977}
+var.gene_sc <- sc_2000@assays$RNA@var.features    #sc_2000 genes list  
+var.gene_st=st_2000@assays$Spatial@var.features     #st_2000 genes list 
+total.genes <- c(var.gene_sc,var.gene_st)
+# 并集
+common.genes1 <- unique(total.genes)
+length(common.genes1 )  #2977
+
+# subset sc&st to combine
+sc=readRDS("/home/huggs/shiyi/SCST/RCTD/RCTD/predata/celltrek_kidney/celltrek_kidney/Mouse_Adult_DGE.rds")
+st<-Seurat::Load10X_Spatial("/home/huggs/shiyi/SCST/RCTD/RCTD/predata/celltrek_kidney/celltrek_kidney/V1_Mouse_Kidney")
+sc_combine=subset(sc,features=common.genes1,slot="counts" ) #2977 features across 40712 samples
+st_combine=subset(st,features=common.genes1,slot="counts" ) #2977 features across 1438 samples
+head(sc_combine@assays$RNA@counts)   
+head(st_combine@assays$Spatial@counts)   
+
+saveRDS(sc_combine,"/home/huggs/shiyi/SCST/RCTD/RCTD/predata/celltrek_kidney/mymodel/1_predata/sc_combine.rds")
+saveRDS(st_combine,"/home/huggs/shiyi/SCST/RCTD/RCTD/predata/celltrek_kidney/mymodel/1_predata/st_combine.rds")
+SaveH5Seurat(sc_combine, filename = "/home/huggs/shiyi/SCST/RCTD/RCTD/predata/celltrek_kidney/mymodel/1_predata/sc_combine.h5Seurat")
+Convert("/home/huggs/shiyi/SCST/RCTD/RCTD/predata/celltrek_kidney/mymodel/1_predata/sc_combine.h5Seurat", dest = "h5ad")
+SaveH5Seurat(st_combine, filename = "/home/huggs/shiyi/SCST/RCTD/RCTD/predata/celltrek_kidney/mymodel/1_predata/st_combine.h5Seurat")
+Convert("/home/huggs/shiyi/SCST/RCTD/RCTD/predata/celltrek_kidney/mymodel/1_predata/st_combine.h5Seurat", dest = "h5ad")
+
+```
+
+
+###no#####################################################################3
+```{r:subset rctd}
+st_combine=readRDS("/s/f/shiyi/ST/hierarchy_dense_net/test1029/mynetwork/mynetwork_scstmerge_deconvolution/MY_RCTD/MYDATA/under_sample/st_combine.rds")
+
+max_1 = read.csv("/s/f/shiyi/ST/hierarchy_dense_net/test1029/mynetwork/mynetwork_scstmerge_deconvolution/MY_RCTD/MYDATA/spots_celltype_max_0419.csv") #挑选出单一细胞类型的spots
+table(max_1$x) 
+length(max_1$x)
+head(max_1$X)
+st_combine_subset=subset(st_combine,cells=max_1$X,slot="counts" ) 
+st_combine_subset@meta.data$annotation_1=max_1$x#3193 features across 316 samples
+saveRDS(st_combine_subset,"/s/f/shiyi/ST/hierarchy_dense_net/test1029/mynetwork/mynetwork_scstmerge_deconvolution/MY_RCTD/MYDATA/under_sample/st_subsetRCTD/st_combine_subset.rds")
+
+#combine 
+big <- merge(sc_combine, y = st_combine, project = "task1",merge.data = TRUE) #add.cell.ids = c("","")
+head(colnames(big))
+tail(colnames(big))
+big
+"""6386 features across 43519 samples within 2 assays 
+Active assay: RNA (3193 features, 0 variable features)
+ 1 other assay present: Spatial有问题,在python中merge"""
+SaveH5Seurat(sc_combine, filename = "/s/f/shiyi/ST/hierarchy_dense_net/test1029/mynetwork/mynetwork_scstmerge_deconvolution/MY_RCTD/MYDATA/under_sample/st_subsetRCTD/sc_combine.h5Seurat")
+Convert("/s/f/shiyi/ST/hierarchy_dense_net/test1029/mynetwork/mynetwork_scstmerge_deconvolution/MY_RCTD/MYDATA/under_sample/st_subsetRCTD/sc_combine.h5Seurat", dest = "h5ad")
+SaveH5Seurat(st_combine_subset, filename = "/s/f/shiyi/ST/hierarchy_dense_net/test1029/mynetwork/mynetwork_scstmerge_deconvolution/MY_RCTD/MYDATA/under_sample/st_subsetRCTD/st_combine_subset.h5Seurat")
+Convert("/s/f/shiyi/ST/hierarchy_dense_net/test1029/mynetwork/mynetwork_scstmerge_deconvolution/MY_RCTD/MYDATA/under_sample/st_subsetRCTD/st_combine_subset.h5Seurat", dest = "h5ad")
+```
+
+#以下不执行 ########################
+
+```{r2python}
+sc_2000=readRDS("/s/f/shiyi/ST/hierarchy_dense_net/test1029/mynetwork/mynetwork_scstmerge_deconvolution/MY_RCTD/MYDATA/under_sample/sc_common_norm_hvg_2000.rds")
+SaveH5Seurat(sc_2000, filename = "/s/f/shiyi/ST/hierarchy_dense_net/test1029/mynetwork/mynetwork_scstmerge_deconvolution/MY_RCTD/MYDATA/under_sample/sc_common_norm_hvg_2000.h5Seurat")
+Convert("/s/f/shiyi/ST/hierarchy_dense_net/test1029/mynetwork/mynetwork_scstmerge_deconvolution/MY_RCTD/MYDATA/under_sample/sc_common_norm_hvg_2000.h5Seurat", dest = "h5ad")
+#st:此数据是在未取交集genes的情况下hvg2000,不可用
+st_2000=readRDS("/s/f/shiyi/ST/hierarchy_dense_net/test1029/mynetwork/mynetwork_scstmerge_deconvolution/MY_RCTD/MYDATA/rawdata_spatial_hvg.rds")#2000 features across 2987 samples 
+SaveH5Seurat(st_2000, filename = "/s/f/shiyi/ST/hierarchy_dense_net/test1029/mynetwork/mynetwork_scstmerge_deconvolution/MY_RCTD/MYDATA/under_sample/rawdata_spatial_hvg_2000.h5Seurat")
+Convert("/s/f/shiyi/ST/hierarchy_dense_net/test1029/mynetwork/mynetwork_scstmerge_deconvolution/MY_RCTD/MYDATA/under_sample/rawdata_spatial_hvg_2000.h5Seurat", dest = "h5ad")
+
+```
+## 计算平均表达个数:在python中计算
+```{r:sc_2000 & st_2000}
+st_2000=readRDS("/s/f/shiyi/ST/hierarchy_dense_net/test1029/mynetwork/mynetwork_scstmerge_deconvolution/MY_RCTD/MYDATA/rawdata_spatial_hvg.rds")#2000 features across 2987 samples 
+scaverages=mean(sc_2000$nFeature_RNA) #343.5245
+staverages=mean(st_2000$nFeature_Spatial)   #593.5939
+alpha=scaverages/staverages #0.5787198
+staverages/scaverages= 1.727952
+#no:这是平均表达量:#staverages <- AverageExpression(st)
+#nFeature_RNA代表每个细胞测到的基因数目。nCount_RNA代表每个细胞测到所有基因的表达量之和。
+#scaverages <- mean(sc_common$nFeature_RNA)  #2149.386
+#staverages <- mean(st_common$nFeature_Spatial)  #4206.647#alpha=0.5109499
+```
+
+# under sampling genes with alpha, keep dims by setting exp=0
+```{python:under sampling genes}
+import numpy as np
+import pandas as pd
+
+#通过以alpha概率生成(st_genenum,st_genenum)大小的只有0，1元素的随机阵，乘以rowdata生成新的数据
+def lower_sample_data(st, alpha):
+    percent=numpy.random.choice([0,1], size=(st.shape[0],st.shape[1]), replace=True, p=alpha)
+    data=st.X * percent
+    return data
+
+
+#通过numpy随机选取多数样本的采样下标
+def lower_sample_data(df, percent=1):
+    '''
+    percent:多数类别下采样的数量相对于少数类别样本数量的比例
+    '''
+    most_data = df[df['label'] == 1]  # 多数类别的样本
+    minority_data = df[df['label'] == 0]  # 少数类别的样本
+    index = np.random.randint(len(most_data), size=int(percent *len(minority_data)) )   # 随机给定下采样取出样本的序号
+    #下采样后数据样本
+    lower_data = most_data.iloc[list(index)]  # 下采样 #对列采样t1[:, 2],不连续t1[:, [2,4]]
+    return(pd.concat([lower_data, minority_data]))
+ 
+#通过pandas的sample函数实现下采样
+def lower_sample_data_by_sample(df,percent=1):
+    most_data = df[df['label'] == 1]  # 多数类别的样本
+    minority_data = df[df['label'] == 0]  # 少数类别的样本   
+    #随机采样most_data中的数据
+ lower_data=most_data.sample(n=int(percent*len(minority_data)),replace=False,random_state=0,axis=0)   
+    return (pd.concat([lower_data,minority_data]))
+    
+ 
+if __name__=='__main__':
+    
+    #设置随机种子
+    np.random.seed(0)
+    
+    #随机生成样本，arr1维度100*6，值在1-10之间
+    arr1=np.random.randint(1,10,size=(100,6))
+    arr2=np.random.randint(20,50,size=(5,6))
+    
+    #将上面的数用pandas存储
+    df1 = pd.DataFrame(arr1, columns=list('abcdef'))
+    df1['label'] = 1
+    df2 = pd.DataFrame(arr2, columns=list('abcdef'))
+    df2['label'] = 0
+    
+    #合并arr1和arr2
+    df = pd.concat([df1, df2])
+    
+    #下采样方式一，调用函数lower_sample_data
+    print(lower_sample_data(df))
+    
+    #下采样方式二，通过sample进行采样
+    print(lower_sample_data_by_sample(df))
+
+
+```
+
+numpy.random.choice(a, size=None, replace=True, p=None)
+• 从给定的一维数组中生成随机数
+• 参数：a 为一维数组类似数据或整数；size 为数组维度；p 为数组中的数据出现的概率.a=[0,1],size=(st_genesnum,st_genesnum),p=alpha
+
