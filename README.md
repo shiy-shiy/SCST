@@ -24,6 +24,7 @@ Create conda environment and install cell2location package
 
 ```sh
 git clone https://github.com/shiy-shiy / SCST.git
+pip install git+git://github.com/shiy-shiy/SCST.git
 ```
 
 ### 2. Data preprocessing
