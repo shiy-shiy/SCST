@@ -1,2 +1,2 @@
-from .desc import train
+from .COSCST import train
 	
