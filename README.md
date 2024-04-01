@@ -10,10 +10,6 @@
     <img src="image/0201_FIG1.jpg" alt="Logo" width="1700" height="800">
   </a>
   <h3 align="center">COSCST WORKFLOW</h3>
-  
-  <p align="center">
-    COSCST WORKFLOW
-    <br />
     <a href="https://github.com/shiy-shiy/SCST/">查看Demo</a>
     ·
     <a href="https://github.com/shiy-shiy/SCST/issues">报告Bug</a>
