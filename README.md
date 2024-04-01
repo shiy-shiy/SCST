@@ -2,6 +2,27 @@
 
 # A Quick Tour of COSCST
 
+<!-- PROJECT LOGO -->
+<br />
+
+<p align="center">
+  <a href="https://github.com/shiy-shiy/SCST/">
+    <img src="images/logo.png" alt="Logo" width="80" height="80">
+  </a>
+
+  
+  <p align="center">
+    COSCST WORKFLOW
+    <br />
+    <a href="https://github.com/shiy-shiy/SCST/">查看Demo</a>
+    ·
+    <a href="https://github.com/shiy-shiy/SCST/issues">报告Bug</a>
+    ·
+    <a href="https://github.com/shiy-shiy/SCST/issues">提出新特性</a>
+  </p>
+
+</p>
+
 Single-cell RNA sequencing data excels in providing high sequencing depth and precision at the single-cell level, but lacks spatial information. Simultaneously, spatial transcriptomics technology visualizes gene expression patterns in their spatial context but has low resolution. Here, we present **COSCST** that combines these two datasets through autoencoder and supervised learning model to map single-cell RNA-seq data with spatial coordination and spatial transcriptomics with precise cell type annotation.
 
 ### 1. Installation
