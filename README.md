@@ -7,7 +7,7 @@
 
 <p align="center">
   <a href="https://github.com/shiy-shiy/SCST/">
-    <img src="FIG1.png" alt="Logo" width="80" height="80">
+    <img src="FIG1.png" alt="Logo" width="170" height="120">
   </a>
 
   
