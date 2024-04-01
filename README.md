@@ -29,35 +29,18 @@ We suggest using a separate conda environment for installing `cell2location`.
 
 Create conda environment and install cell2location package
 
-###### 开发前的配置要求
+###### **Configuration requirements**
 
 1. xxxxx x.x.x
 2. xxxxx x.x.x
 
-###### **安装步骤**
-
-1. Get a free API Key at [https://example.com](https://example.com)
-2. Clone the repo
-
+###### **INSTALL STEP**
 ```sh
 git clone https://github.com/shiy-shiy / SCST.git
-pip install git+git://github.com/shiy-shiy/SCST.git
+pip install COSCST
 ```
 
-### 2. Data preprocessing
-
-
-
-
-
-
-
-
-
-
-
-
-
+### 2. Usage
 
 eg:
 
