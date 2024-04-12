@@ -46,75 +46,57 @@ Firstly, import COSCST package.
 from DIST import *
 ```
 
-Secondly, create training and test dataset from outputs of COSCST network.
+Secondly, create training and test dataset from outputs of COSCST network, following the /model/4_inputdata.ipynb, 4_testdata.ipynb
+and 4_train_valid.ipynb.
+
 
 Thirdly, run COSCST; transform the outputs of network into imputed expression matrix and its spot coordinate matrix.
-eg:
 
+```sh
+data=sc.read_h5ad("testdata/inputdata_celltrek_kidney.h5ad")
+data #202932 × 2977
+#定义距离阈值，判断neighbor
+save_dir="/loaddesc"
+test1=desc.train(data,
+        dims=[data.shape[1],512,64],
+        myobs=data.obs,
+        n_clusters=10,
+        tol=0.1,#todo
+        n_neighbors=10,
+        batch_size=512,#
+        epochs_fit=20,
+        pretrain_epochs=50, #
+        save_dir=str(save_dir),
+        do_mytsne=True,
+        do_tsne=False,
+        learning_rate=200, # the parameter of tsne
+        use_GPU=True,#False
+        num_Cores=4, #for reproducible, only use 1 cpu
+        num_Cores_tsne=4,
+        save_encoder_weights=True,
+        save_encoder_step=3,# save_encoder_weights is False, this parameter is not used
+        use_ae_weights=True,
+        do_umap=False,
+        do_myumap=True,
+        do_myumap_X_Embeded_z=False) #if do_uamp is False, it will don't compute umap coordiate
+
+test1.write_h5ad("loaddesc.h5ad")
 ```
-filetree 
-├── ARCHITECTURE.md
-├── LICENSE.txt
-├── README.md
-├── /account/
-├── /bbs/
-├── /docs/
-│  ├── /rules/
-│  │  ├── backend.txt
-│  │  └── frontend.txt
-├── manage.py
-├── /oa/
-├── /static/
-├── /templates/
-├── useless.md
-└── /util/
 
-```
+where `dims`, `tol`, `batch_size`, `pretrain_epochs`,`learning_rate` are parameters of network, `use_GPU` is the GPUs whether you want to use.
 
 
 
-
-
-### 开发的架构 
-
-请阅读[ARCHITECTURE.md](https://github.com/shiy-shiy / SCST/blob/master/ARCHITECTURE.md) 查阅为该项目的架构。
-
-### 部署
-
-暂无
-
-### 使用到的框架
-
-- [xxxxxxx](https://getbootstrap.com)
-- [xxxxxxx](https://jquery.com)
-- [xxxxxxx](https://laravel.com)
-
-### 贡献者
+### License
 
 请阅读**CONTRIBUTING.md** 查阅为该项目做出贡献的开发者。
 
-#### 如何参与开源项目
-
-贡献使开源社区成为一个学习、激励和创造的绝佳场所。你所作的任何贡献都是**非常感谢**的。
-
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-
-
-### 版本控制
-
-该项目使用Git进行版本管理。您可以在repository参看当前可用版本。
+###Citation
 
 ### 作者
 
 xxx@xxxx
 
-知乎:xxxx  &ensp; qq:xxxxxx    
 
  *您也可以在贡献者名单中参看所有参与该项目的开发者。*
 
