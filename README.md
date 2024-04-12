@@ -91,21 +91,12 @@ where `dims`, `tol`, `batch_size`, `pretrain_epochs`,`learning_rate` are paramet
 
 请阅读**CONTRIBUTING.md** 查阅为该项目做出贡献的开发者。
 
-###Citation
+### Citation
 
-### 作者
+
+### Writers
 
 xxx@xxxx
-
-
- *您也可以在贡献者名单中参看所有参与该项目的开发者。*
-
-### 版权说明
-
-该项目签署了MIT 授权许可，详情请参阅 [LICENSE.txt](https://github.com/shiy-shiy / SCST/blob/master/LICENSE.txt)
-
-### 鸣谢
-
 
 - [GitHub Emoji Cheat Sheet](https://www.webpagefx.com/tools/emoji-cheat-sheet)
 - [Img Shields](https://shields.io)
