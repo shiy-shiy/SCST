@@ -7,7 +7,7 @@
 
 <p align="center">
   <a href="https://github.com/shiy-shiy/SCST/">
-    <img src="image/0201_FIG1.jpg" alt="Logo" width="1700" height="800">
+    <img src="image/0201_FIG1.jpg" alt="Logo" width="800" height="600">
   </a>
   <h3 align="center">COSCST WORKFLOW</h3>
     <a href="https://github.com/shiy-shiy/SCST/">查看Demo</a>
@@ -41,7 +41,14 @@ pip install COSCST
 ```
 
 ### 2. Usage
+Firstly, import COSCST package.
+```sh
+from DIST import *
+```
 
+Secondly, create training and test dataset from outputs of COSCST network.
+
+Thirdly, run COSCST; transform the outputs of network into imputed expression matrix and its spot coordinate matrix.
 eg:
 
 ```
