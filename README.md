@@ -23,20 +23,23 @@ Single-cell RNA sequencing data excels in providing high sequencing depth and pr
 
 ### 1. Installation
 
-To install `COSCST` package you must make sure that your `tensorflow` version `2.x`. You decide to use CPU or GPU to run `tensorflow` according your devices. GPU could accelerate tensorflow by installing `tensorflow-gpu`. In addtation, please make sure your python version is compatible with tensorflow 2.x. In our paper, we used `python 3.6.x` .
+To install `COSCST` package you must make sure that your `tensorflow` version `2.x`. You decide to use CPU or GPU to run `tensorflow` according your devices. GPU could accelerate tensorflow by installing `tensorflow-gpu`. In addtation, please make sure your python version is compatible with tensorflow 2.x. In our paper, we used `python 3.6.x` and `R 4.0.2`.
 
-We suggest using a separate conda environment for installing `cell2location`.
+We suggest using a separate conda environment for installing `coscst`.
 
 Create conda environment and install cell2location package
 
 ###### **Configuration requirements**
 
-1. xxxxx x.x.x
-2. xxxxx x.x.x
+1. RCTD
+2. DESC
 
 ###### **INSTALL STEP**
 ```sh
-git clone https://github.com/shiy-shiy / SCST.git
+git clone https://github.com/shiy-shiy/SCST.git
+```
+or
+```sh
 pip install COSCST
 ```
 
