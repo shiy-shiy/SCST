@@ -43,7 +43,7 @@ pip install COSCST
 ### 2. Usage
 Firstly, import COSCST package.
 ```sh
-from DIST import *
+from COSCST import *
 ```
 
 Secondly, create training and test dataset from outputs of COSCST network, following the /model/4_inputdata.ipynb, 4_testdata.ipynb
