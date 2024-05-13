@@ -59,8 +59,8 @@ Thirdly, run COSCST; transform the outputs of network into imputed expression ma
 data=sc.read_h5ad("testdata/inputdata_celltrek_kidney.h5ad")
 data #202932 × 2977
 #定义距离阈值，判断neighbor
-save_dir="/loaddesc"
-test1=desc.train(data,
+save_dir="/testcoscst"
+test1=coscst.train(data,
         dims=[data.shape[1],512,64],
         myobs=data.obs,
         n_clusters=10,
