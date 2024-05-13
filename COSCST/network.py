@@ -47,7 +47,7 @@ from numba import jit, cuda
 try:
     from .SAE import SAE  # this is for installing package
 except:
-    from SAE import SAE  #  this is for testing whether DescModel work or not 
+    from SAE import SAE  #  this is for testing whether Model work or not 
 random.seed(201809)
 np.random.seed(201809)
 tf.random.set_seed(201809)
@@ -130,7 +130,7 @@ class ClusteringLayerGaussian(ClusteringLayer):
         return q
 
 
-class DescModel(object):
+class Model(object):
     """
     pretrain: 1.SAE
               2.kmeans
@@ -477,7 +477,7 @@ if __name__ == "__main__":
     # setting the hyper parameters
     import argparse
 
-    parser = argparse.ArgumentParser(description='DescModel class test',
+    parser = argparse.ArgumentParser(description='Model class test',
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--batch_size', default=256, type=int)
     parser.add_argument('--maxiter', default=2e4, type=int)
@@ -507,14 +507,14 @@ if __name__ == "__main__":
     init = 'glorot_uniform'
     #dims=[x.shape[-1], 500, 300, 100, 30]
     dims=[x.shape[-1],64,32]
-    # prepare sample data to  the DESC model
+    # prepare sample data to  the  model
     import os
     os.environ["CUDA_VISIBLE_DEVICES"]="-1"
-    desc = DescModel(dims=dims,x=x,louvain_resolution=0.8,use_ae_weights=True,epochs_fit=0.4)
-    desc.model.summary()
+    coscst = Model(dims=dims,x=x,louvain_resolution=0.8,use_ae_weights=True,epochs_fit=0.4)
+    coscst.model.summary()
     t0 = get_time()
-    desc.compile(optimizer=SGD(0.01, 0.9), loss='kld')
-    Embedded_z,q_pred= desc.fit(maxiter=30)
+    coscst.compile(optimizer=SGD(0.01, 0.9), loss='kld')
+    Embedded_z,q_pred=coscst.fit(maxiter=30)
     y_pred=q_pred.max(axis=1)
     obs_info=pd.DataFrame()
     obs_info["y_true"]=pd.Series(y.astype("U"),dtype="category")
