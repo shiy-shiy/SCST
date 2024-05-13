@@ -140,7 +140,7 @@ def train_single(data,dims=None,
   
     tic=get_time()#recored time         
     #desc=DescModel(dims=dims,
-    coscst=DescModel(dims=dims,
+    coscst=Model(dims=dims,
               x=adata.X,
               obs=myobs,
               alpha=alpha,
