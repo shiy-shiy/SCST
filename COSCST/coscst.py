@@ -139,7 +139,8 @@ def train_single(data,dims=None,
         os.remove(os.path.join(save_dir,"ae_weights.h5"))
   
     tic=get_time()#recored time         
-    desc=DescModel(dims=dims,
+    #desc=DescModel(dims=dims,
+    coscst=DescModel(dims=dims,
               x=adata.X,
               obs=myobs,
               alpha=alpha,
@@ -277,9 +278,7 @@ def train(data,dims=None,
         do_umap=False,
         kernel_clustering="t"
 ): 
-    """ Deep Embeded single cell clustering(DESC) API
-    Conduct clustering for single cell data given in the anndata object or np.ndarray,sp.sparmatrix,or pandas.DataFrame
-      
+    """ 
     
     Argument:
     ------------------------------------------------------------------
@@ -434,9 +433,9 @@ if __name__=='__main__':
     sc.pp.scale(adata, max_value=10)
     '''
     adata=train(adata,myobs=adata.obs,use_GPU=False,num_Cores=1,use_ae_weights=False,kernel_clustering="gaussian")#,louvain_resolution=0.6
-    adata.write("/s/f/shiyi/ST/Data/test/result_tmp/adata_desc.h5ad")
+    adata.write("./result_tmp/adata.h5ad")
     adata=train(adata,myobs=adata.obs,use_GPU=False,num_Cores=1,use_ae_weights=False,kernel_clustering="t",save_dir="/s/f/shiyi/ST/Data/test/result_tmp2/result_tmp2")#,louvain_resolution=0.6
-    adata.write("/s/f/shiyi/ST/Data/test/result_tmp2/adata_desc.h5ad")
+    adata.write("./result_tmp2/adata.h5ad")
     #adata=train(adata,louvain_resolution="0.2,0.4,0.5",use_GPU=True,use_ae_weights=True,save_encoder_weights=True)
     #adata=train(adata,louvain_resolution='0.5,0.4,0.7',use_GPU=True,use_ae_weights=False,save_encoder_weights=True)
 
