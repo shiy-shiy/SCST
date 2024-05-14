@@ -49,14 +49,14 @@ Firstly, import COSCST package.
 from COSCST import *
 ```
 
-Secondly, create training and test dataset from outputs of COSCST network, following the /model/4_inputdata.ipynb, 4_testdata.ipynb
+Secondly, create training and test dataset from outputs of COSCST network, following the /tutorial/4_inputdata.ipynb, 4_testdata.ipynb
 and 4_train_valid.ipynb.
 
 
 Thirdly, run COSCST; transform the outputs of network into imputed expression matrix and its spot coordinate matrix.
 
 ```sh
-data=sc.read_h5ad("testdata/inputdata_celltrek_kidney.h5ad")
+data=sc.read_h5ad("test_data/inputdata_celltrek_kidney.h5ad")
 data #202932 × 2977
 #定义距离阈值，判断neighbor
 save_dir="/testcoscst"
@@ -92,36 +92,21 @@ where `dims`, `tol`, `batch_size`, `pretrain_epochs`,`learning_rate` are paramet
 
 ### License
 
-请阅读**CONTRIBUTING.md** 查阅为该项目做出贡献的开发者。
+**CONTRIBUTING.md** 
 
 ### Citation
 
 
 ### Writers
 
-xxx@xxxx
+shiyi@nankai.mail.edu.cn
+shiyieleven7@gmail.com
 
-- [GitHub Emoji Cheat Sheet](https://www.webpagefx.com/tools/emoji-cheat-sheet)
-- [Img Shields](https://shields.io)
-- [Choose an Open Source License](https://choosealicense.com)
 - [GitHub Pages](https://pages.github.com)
-- [Animate.css](https://daneden.github.io/animate.css)
-- [xxxxxxxxxxxxxx](https://connoratherton.com/loaders)
+
 
 <!-- links -->
-[your-project-path]:shiy-shiy / SCST
-[contributors-shield]: https://img.shields.io/github/contributors/shiy-shiy / SCST.svg?style=flat-square
-[contributors-url]: https://github.com/shiy-shiy / SCST/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/shiy-shiy / SCST.svg?style=flat-square
-[forks-url]: https://github.com/shiy-shiy / SCST/network/members
-[stars-shield]: https://img.shields.io/github/stars/shiy-shiy / SCST.svg?style=flat-square
-[stars-url]: https://github.com/shiy-shiy / SCST/stargazers
-[issues-shield]: https://img.shields.io/github/issues/shiy-shiy / SCST.svg?style=flat-square
-[issues-url]: https://img.shields.io/github/issues/shiy-shiy / SCST.svg
-[license-shield]: https://img.shields.io/github/license/shiy-shiy / SCST.svg?style=flat-square
-[license-url]: https://github.com/shiy-shiy / SCST/blob/master/LICENSE.txt
-[linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=flat-square&logo=linkedin&colorB=555
-[linkedin-url]: https://linkedin.com/in/shaojintian
+
 
 
 
