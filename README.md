@@ -56,7 +56,7 @@ and 4_train_valid.ipynb.
 Thirdly, run COSCST; transform the outputs of network into imputed expression matrix and its spot coordinate matrix.
 
 ```sh
-data=sc.read_h5ad("test_data/inputdata_celltrek_kidney.h5ad")
+data=sc.read_h5ad("test_data/inputdata_celltrek_kidney.h5ad")  #created by /test_data/testdata_undersample.h5ad,traindata_undersample.h5ad,validation_undersample.h5ad through /tutorial/4_inputdata.ipynb
 data #202932 × 2977
 #定义距离阈值，判断neighbor
 save_dir="/testcoscst"
