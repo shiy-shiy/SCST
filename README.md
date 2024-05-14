@@ -10,11 +10,11 @@
     <img src="image/0201_FIG1.jpg" alt="Logo" width="800" height="600">
   </a>
   <h3 align="center">COSCST WORKFLOW</h3>
-    <a href="https://github.com/shiy-shiy/SCST/">查看Demo</a>
+    <a href="https://github.com/shiy-shiy/SCST/">Demo</a>
     ·
-    <a href="https://github.com/shiy-shiy/SCST/issues">报告Bug</a>
+    <a href="https://github.com/shiy-shiy/SCST/issues">Report Bug</a>
     ·
-    <a href="https://github.com/shiy-shiy/SCST/issues">提出新特性</a>
+    <a href="https://github.com/shiy-shiy/SCST/issues">Improve New</a>
   </p>
 
 </p>
