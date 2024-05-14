@@ -100,6 +100,7 @@ where `dims`, `tol`, `batch_size`, `pretrain_epochs`,`learning_rate` are paramet
 ### Writers
 
 shiyi@nankai.mail.edu.cn
+
 shiyieleven7@gmail.com
 
 - [GitHub Pages](https://pages.github.com)
